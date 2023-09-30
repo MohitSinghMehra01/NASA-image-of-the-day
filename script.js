@@ -1,80 +1,92 @@
-// Constants
+// Get your NASA API key from https://api.nasa.gov/
 const apiKey = 'ybd3dllNdYKB4rixyBULrCkVwSw8L9tSfDLbwnlM';
-const searchForm = document.getElementById('search-form');
-const searchInput = document.getElementById('search-input');
-const currentImageContainer = document.getElementById('current-image');
-const searchHistoryList = document.getElementById('search-history');
 
-// Event listener for form submission
-searchForm.addEventListener('submit', function (e) {
-    e.preventDefault();
-    const selectedDate = searchInput.value;
-
-    // Call getImageOfTheDay with the selected date
-    getImageOfTheDay(selectedDate);
-});
-
-// Function to get the image of the day for the current date
+// Function to fetch the image of the day for the current date
 function getCurrentImageOfTheDay() {
     const currentDate = new Date().toISOString().split("T")[0];
-    getImageOfTheDay(currentDate);
-}
-
-// Function to get the image of the day for a specific date
-function getImageOfTheDay(date) {
-    const apiUrl = `https://api.nasa.gov/planetary/apod?date=${date}&api_key=${apiKey}`;
+    const apiUrl = `https://api.nasa.gov/planetary/apod?api_key=${apiKey}&date=${currentDate}`;
 
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
-            // Display the image and title in the current-image container
-            currentImageContainer.innerHTML = `
-                <img src="${data.url}" alt="${data.title}">
-                <h3>${data.title}</h3>
-            `;
-
-            // Save the selected date to local storage and add it to the search history
-            saveSearch(date);
-            addSearchToHistory();
+            displayImage(data);
         })
         .catch(error => {
-            console.error('Error fetching data:', error);
-            currentImageContainer.innerHTML = '<p>An error occurred while fetching the image.</p>';
+            console.error("Error fetching current image:", error);
+            // Handle error display here
         });
+}
+
+// Function to fetch and display the image of the day for a selected date
+function getImageOfTheDay(date) {
+    const apiUrl = `https://api.nasa.gov/planetary/apod?api_key=${apiKey}&date=${date}`;
+
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            displayImage(data);
+            saveSearch(date);
+        })
+        .catch(error => {
+            console.error("Error fetching image for date:", error);
+            // Handle error display here
+        });
+}
+
+// Function to display an image in the "current-image-container"
+function displayImage(data) {
+    const container = document.getElementById('current-image-container');
+    container.innerHTML = `
+    <img src="${data.url}" alt="${data.title}">
+    <h2>${data.title}</h2>
+        <p>${data.explanation}</p>
+    `;
 }
 
 // Function to save the selected date to local storage
 function saveSearch(date) {
-    // Retrieve the existing searches from local storage or initialize an empty array
-    const searches = JSON.parse(localStorage.getItem('searches')) || [];
+    // Retrieve the existing search history array from local storage
+    let searches = JSON.parse(localStorage.getItem('searches')) || [];
 
-    // Add the selected date to the array
+    // Add the new date to the search history array
     searches.push(date);
 
-    // Save the updated array back to local storage
+    // Save the updated search history array back to local storage
     localStorage.setItem('searches', JSON.stringify(searches));
+
+    // Update the search history list in the UI
+    addSearchToHistory();
 }
 
-// Function to add the search history to the UI
+// Function to add search history to the UI
 function addSearchToHistory() {
-    // Retrieve the saved searches from local storage
+    const historyList = document.getElementById('search-history');
+    historyList.innerHTML = '';
+
+    // Retrieve the search history array from local storage
     const searches = JSON.parse(localStorage.getItem('searches')) || [];
 
-    // Clear the existing search history list
-    searchHistoryList.innerHTML = '';
-
-    // Create list items for each saved search date
+    // Display search history as list items
     searches.forEach(date => {
         const listItem = document.createElement('li');
         listItem.textContent = date;
-
-        // Add a click event listener to fetch and display the image for the clicked date
-        listItem.addEventListener('click', () => getImageOfTheDay(date));
-
-        searchHistoryList.appendChild(listItem);
+        listItem.addEventListener('click', () => {
+            getImageOfTheDay(date);
+        });
+        historyList.appendChild(listItem);
     });
 }
 
-// Display the current image of the day when the page loads
+// Event listener for the search form submission
+const searchForm = document.getElementById('search-form');
+searchForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const dateInput = document.getElementById('search-input').value;
+    getImageOfTheDay(dateInput);
+});
+
+// Initialize the page by fetching and displaying the current image of the day
 getCurrentImageOfTheDay();
+
+// Load and display the search history from local storage
 addSearchToHistory();

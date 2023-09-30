@@ -3,35 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NASA Picture of the Day</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="./style.css">
+    <title>NASA Image of the Day</title>
 </head>
 <body>
-  <header>
-      <h1>NASA Picture of the Day</h1>
-  </header>
-    <section class="current-image-container">
-        
-        <div id="current-image">
-            <!-- Image of the day will be displayed here -->
+    <div class="container-img">
+        <div>
+            <h1>NASA Image of the Day</h1>
         </div>
-
-    </section>
-
-    <section class="search-container">
+        <div id="current-image-container">
+            <!-- Current image of the day will be displayed here -->
+        </div>
+        
+    </div>
+    <h2>Search for a picture of the day</h2>
+    <div>
         <form id="search-form">
             <label for="search-input">Select a Date:</label>
             <input type="date" id="search-input" required>
             <button type="submit">Search</button>
         </form>
-    </section>
-
-    <section class="search-history-container">
-        <h2>Search History</h2>
+        <h2>Previous Searchs</h2>
         <ul id="search-history">
-            <!-- Search history items will be displayed here -->
+            <!-- Search history will be displayed here -->
         </ul>
-    </section>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
